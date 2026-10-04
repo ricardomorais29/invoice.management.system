@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>{% block title %}Velo{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#fafafa;--surface:#fff;--border:#e8e8e8;--border2:#f0f0f0;--ink:#111;--ink2:#555;--ink3:#999;--green:#16a34a;--green-bg:#f0fdf4;--red:#dc2626;--red-bg:#fef2f2;--radius:10px;--shadow:0 1px 3px rgba(0,0,0,.06);}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Geist',-apple-system,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;}
+    .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+    .sidebar-brand{padding:24px 20px 20px;border-bottom:1px solid var(--border2);}
+    .sidebar-brand h1{font-size:1.35rem;font-weight:600;letter-spacing:-.5px;}
+    .sidebar-brand h1 span{color:var(--ink3);font-weight:300;}
+    .sidebar-brand p{font-size:.7rem;color:var(--ink3);margin-top:3px;}
+    .sidebar nav{padding:16px 12px;flex:1;}
+    .nav-section{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;color:var(--ink3);padding:0 10px;margin:14px 0 5px;}
+    .nav-link{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;color:var(--ink2);text-decoration:none;font-size:.875rem;font-weight:450;transition:all .12s;margin-bottom:1px;}
+    .nav-link:hover{background:var(--bg);color:var(--ink);}
+    .nav-link.active{background:var(--ink);color:#fff;}
+    .nav-icon{font-size:.95rem;width:18px;text-align:center;opacity:.7;}
+    .nav-link.active .nav-icon{opacity:1;}
+    .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border2);}
+    .user-pill{display:flex;align-items:center;gap:9px;font-size:.82rem;}
+    .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;flex-shrink:0;}
+    .user-info{flex:1;overflow:hidden;}
+    .user-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .user-email{font-size:.7rem;color:var(--ink3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .logout-link{font-size:.75rem;color:var(--ink3);text-decoration:none;margin-top:8px;display:block;}
+    .logout-link:hover{color:var(--red);}
+    .main{margin-left:220px;flex:1;display:flex;flex-direction:column;}
+    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;gap:12px;}
+    .topbar h2{font-size:1.05rem;font-weight:600;letter-spacing:-.3px;}
+    .topbar-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+    .content{padding:28px;}
+    .flash-list{list-style:none;margin-bottom:18px;}
+    .flash-list li{padding:10px 16px;border-radius:var(--radius);font-size:.85rem;margin-bottom:6px;}
+    .flash-success{background:var(--green-bg);color:var(--green);border:1px solid #bbf7d0;}
+    .flash-info{background:#f5f5f5;color:var(--ink2);border:1px solid var(--border);}
+    .flash-error{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;}
+    .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:28px;}
+    .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+    .stat-card.highlight{background:var(--ink);}
+    .stat-card.highlight .stat-label{color:rgba(255,255,255,.5);}
+    .stat-card.highlight .stat-value,.stat-card.highlight .stat-sub{color:#fff;}
+    .stat-label{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);margin-bottom:8px;}
+    .stat-value{font-size:1.8rem;font-weight:600;letter-spacing:-1px;line-height:1;}
+    .stat-sub{font-size:.75rem;color:var(--ink3);margin-top:5px;}
+    .table-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);}
+    .table-header{padding:16px 22px;border-bottom:1px solid var(--border2);display:flex;align-items:center;justify-content:space-between;}
+    .table-header h3{font-size:.95rem;font-weight:600;}
+    table{width:100%;border-collapse:collapse;}
+    th{text-align:left;padding:9px 22px;font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--ink3);background:var(--bg);border-bottom:1px solid var(--border);}
+    td{padding:12px 22px;font-size:.865rem;border-bottom:1px solid var(--border2);vertical-align:middle;}
+    tr:last-child td{border-bottom:none;}
+    tbody tr:hover td{background:#fafafa;}
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;}
+    .badge::before{content:'●';font-size:.5rem;}
+    .badge-paid{background:var(--green-bg);color:var(--green);}
+    .badge-unpaid{background:var(--red-bg);color:var(--red);}
+    .btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;border-radius:7px;font-family:'Geist',sans-serif;font-size:.84rem;font-weight:500;cursor:pointer;border:none;text-decoration:none;transition:all .12s;white-space:nowrap;}
+    .btn-primary{background:var(--ink);color:#fff;}.btn-primary:hover{background:#333;}
+    .btn-outline{background:transparent;color:var(--ink);border:1px solid var(--border);}.btn-outline:hover{background:var(--bg);}
+    .btn-danger{background:var(--red-bg);color:var(--red);border:1px solid #fecaca;}.btn-danger:hover{background:#fee2e2;}
+    .btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:#15803d;}
+    .btn-sm{padding:5px 11px;font-size:.78rem;}
+    .form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);max-width:540px;}
+    .form-group{margin-bottom:18px;}
+    label{display:block;font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--ink3);margin-bottom:6px;}
+    input,select,textarea{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:7px;font-family:'Geist',sans-serif;font-size:.875rem;background:var(--bg);color:var(--ink);transition:border .12s;}
+    input:focus,select:focus,textarea:focus{outline:none;border-color:var(--ink);background:#fff;box-shadow:0 0 0 3px rgba(0,0,0,.06);}
+    textarea{resize:vertical;min-height:80px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .detail-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;}
+    .detail-meta{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);}
+    .meta-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border2);font-size:.865rem;}
+    .meta-row:last-child{border-bottom:none;}
+    .meta-key{color:var(--ink3);font-size:.8rem;}
+    .meta-val{font-weight:500;}
+    .total-row td{font-weight:600;font-size:.95rem;background:var(--bg);}
+    .email-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow);margin-top:18px;}
+    .email-panel h4{font-size:.9rem;font-weight:600;margin-bottom:14px;}
+    .email-row{display:flex;gap:8px;}.email-row input{flex:1;}
+    .filter-tabs{display:flex;gap:6px;margin-bottom:18px;}
+    .filter-tab{padding:6px 14px;border-radius:20px;font-size:.8rem;font-weight:500;text-decoration:none;color:var(--ink2);border:1px solid var(--border);transition:all .12s;}
+    .filter-tab:hover{border-color:var(--ink);color:var(--ink);}
+    .filter-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+    .empty-state{text-align:center;padding:56px 20px;color:var(--ink3);}
+    .empty-state strong{font-size:.95rem;color:var(--ink2);}
+    .empty-state p{font-size:.85rem;margin-top:6px;}
+    .mono{font-family:'Geist Mono',monospace;}
+    .auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);width:100%;}
+    .auth-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:40px;box-shadow:var(--shadow);width:100%;max-width:420px;}
+    .auth-logo{font-size:1.6rem;font-weight:600;letter-spacing:-.5px;margin-bottom:6px;}
+    .auth-logo span{color:var(--ink3);font-weight:300;}
+    .auth-sub{font-size:.85rem;color:var(--ink3);margin-bottom:28px;}
+    .auth-footer{text-align:center;margin-top:20px;font-size:.83rem;color:var(--ink3);}
+    .auth-footer a{color:var(--ink);font-weight:500;text-decoration:none;}
+    .btn-block{width:100%;justify-content:center;padding:11px;}
+  </style>
+</head>
+<body>
+{% block body %}
+  <aside class="sidebar">
+    <div class="sidebar-brand"><h1>Velo<span>.</span></h1><p>Invoice Tracker</p></div>
+    <nav>
+      <div class="nav-section">Main</div>
+      <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint=='dashboard' %}active{% endif %}"><span class="nav-icon">⊞</span> Dashboard</a>
+      <div class="nav-section">Manage</div>
+      <a href="{{ url_for('invoices') }}" class="nav-link {% if 'invoice' in request.endpoint %}active{% endif %}"><span class="nav-icon">≡</span> Invoices</a>
+      <a href="{{ url_for('clients') }}" class="nav-link {% if 'client' in request.endpoint %}active{% endif %}"><span class="nav-icon">○</span> Clients</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="user-avatar">{{ session.user_name[0].upper() if session.user_name else '?' }}</div>
+        <div class="user-info">
+          <div class="user-name">{{ session.user_name }}</div>
+          <div class="user-email">{{ session.user_email }}</div>
+        </div>
+      </div>
+      <a href="{{ url_for('settings') }}" class="logout-link" style="margin-bottom:4px">Settings</a><a href="{{ url_for('logout') }}" class="logout-link">Sign out →</a>
+    </div>
+  </aside>
+  <div class="main">
+    <div class="topbar">
+      <h2>{% block page_title %}{% endblock %}</h2>
+      <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+    </div>
+    <div class="content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}<ul class="flash-list">{% for cat,msg in messages %}<li class="flash-{{ cat }}">{{ msg }}</li>{% endfor %}</ul>{% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{% endblock %}
+</body>
+</html>

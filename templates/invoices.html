@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}Invoices — Velo{% endblock %}
+{% block page_title %}Invoices{% endblock %}
+{% block topbar_actions %}<a href="{{ url_for('create_invoice') }}" class="btn btn-primary">+ New Invoice</a>{% endblock %}
+{% block content %}
+<div class="filter-tabs">
+  <a href="{{ url_for('invoices') }}" class="filter-tab {% if status_filter=='all' %}active{% endif %}">All</a>
+  <a href="{{ url_for('invoices',status='Unpaid') }}" class="filter-tab {% if status_filter=='Unpaid' %}active{% endif %}">Unpaid</a>
+  <a href="{{ url_for('invoices',status='Paid') }}" class="filter-tab {% if status_filter=='Paid' %}active{% endif %}">Paid</a>
+</div>
+<div class="table-card">
+  <div class="table-header"><h3>{{ status_filter|capitalize if status_filter!='all' else 'All' }} Invoices</h3><span style="color:var(--ink3);font-size:.82rem">{{ invoices|length }}</span></div>
+  {% if invoices %}
+  <table>
+    <thead><tr><th>Invoice</th><th>Client</th><th>Date</th><th>Due</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for inv in invoices %}
+      <tr>
+        <td class="mono" style="font-size:.82rem">{{ inv.invoice_num }}</td>
+        <td>{{ inv.client_name }}</td>
+        <td style="color:var(--ink3)">{{ inv.date }}</td>
+        <td style="color:var(--ink3)">{{ inv.due_date or '—' }}</td>
+        <td><strong>&#8364;{{ "%.2f"|format(inv.total_amount) }}</strong></td>
+        <td><span class="badge badge-{{ inv.status|lower }}">{{ inv.status }}</span></td>
+        <td style="display:flex;gap:6px;padding:12px 22px">
+          <a href="{{ url_for('invoice_detail',invoice_id=inv.id) }}" class="btn btn-outline btn-sm">Open</a>
+          <a href="{{ url_for('generate_pdf',invoice_id=inv.id) }}" class="btn btn-outline btn-sm">PDF</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><strong>No invoices</strong><p>{% if status_filter!='all' %}No {{ status_filter|lower }} invoices.{% else %}Create your first invoice.{% endif %}</p></div>
+  {% endif %}
+</div>
+{% endblock %}

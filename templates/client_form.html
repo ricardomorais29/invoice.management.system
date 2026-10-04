@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Editar' if client else 'Novo' }} Cliente — Velo{% endblock %}
+{% block page_title %}{{ 'Editar' if client else 'Novo' }} Cliente{% endblock %}
+{% block topbar_actions %}<a href="{{ url_for('clients') }}" class="btn btn-outline">← Voltar</a>{% endblock %}
+{% block content %}
+<div class="form-card">
+  <form method="post">
+    <div class="form-group"><label>Nome / Empresa</label><input type="text" name="name" value="{{ client.name if client else '' }}" required placeholder="Nome do cliente ou empresa"></div>
+    <div class="form-row">
+      <div class="form-group"><label>Email</label><input type="email" name="email" value="{{ client.email if client else '' }}" required placeholder="email@exemplo.com"></div>
+      <div class="form-group"><label>Telefone</label><input type="text" name="phone" value="{{ client.phone if client else '' }}" placeholder="+351 900 000 000"></div>
+    </div>
+    <div class="form-group">
+      <label>NIF</label>
+      <input type="text" name="nif" value="{{ client.nif if client else '' }}" placeholder="PT000000000">
+      <p style="font-size:.73rem;color:var(--ink3);margin-top:4px">Obrigatório para faturas a empresas e trabalhadores independentes.</p>
+    </div>
+    <div class="form-group"><label>Morada</label><textarea name="address" placeholder="Rua, Cidade, Código Postal, Portugal">{{ client.address if client else '' }}</textarea></div>
+    <div style="display:flex;gap:8px">
+      <button type="submit" class="btn btn-primary">{{ 'Guardar' if client else 'Adicionar Cliente' }}</button>
+      <a href="{{ url_for('clients') }}" class="btn btn-outline">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

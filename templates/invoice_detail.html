@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}{{ invoice.invoice_num }} — Velo{% endblock %}
+{% block page_title %}<span class="mono">{{ invoice.invoice_num }}</span>{% endblock %}
+{% block topbar_actions %}
+  <a href="{{ url_for('invoices') }}" class="btn btn-outline">← Voltar</a>
+  <a href="{{ url_for('generate_pdf',invoice_id=invoice.id) }}" class="btn btn-outline">↓ PDF</a>
+  {% if invoice.status=='Unpaid' %}
+    <form action="{{ url_for('mark_paid',invoice_id=invoice.id) }}" method="post" style="display:inline"><button class="btn btn-green">✓ Marcar Pago</button></form>
+  {% else %}
+    <form action="{{ url_for('mark_unpaid',invoice_id=invoice.id) }}" method="post" style="display:inline"><button class="btn btn-outline">↩ Não Pago</button></form>
+  {% endif %}
+  <form action="{{ url_for('delete_invoice',invoice_id=invoice.id) }}" method="post" style="display:inline" onsubmit="return confirm('Eliminar fatura?')"><button class="btn btn-danger">Eliminar</button></form>
+{% endblock %}
+{% block content %}
+<div class="detail-grid">
+  <div>
+    <div class="table-card" style="margin-bottom:20px">
+      <div class="table-header"><h3>Linhas</h3><span class="badge badge-{{ invoice.status|lower }}">{{ invoice.status }}</span></div>
+      <table>
+        <thead><tr><th>Descrição</th><th>Qtd</th><th>Preço Unit.</th><th>IVA %</th><th>IVA EUR</th><th>Total c/ IVA</th><th></th></tr></thead>
+        <tbody>
+          {% for item in items %}
+          <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity|int }}</td>
+            <td>&#8364;{{ "%.2f"|format(item.price) }}</td>
+            <td>{{ item.vat_rate|int }}%</td>
+            <td>&#8364;{{ "%.2f"|format(item.vat_amount) }}</td>
+            <td><strong>&#8364;{{ "%.2f"|format(item.line_total + item.vat_amount) }}</strong></td>
+            <td><form action="{{ url_for('delete_item',invoice_id=invoice.id,item_id=item.id) }}" method="post" onsubmit="return confirm('Remover?')"><button class="btn btn-danger btn-sm">✕</button></form></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" style="text-align:center;color:var(--ink3);padding:28px">Sem linhas ainda.</td></tr>
+          {% endfor %}
+          {% if items %}
+          <tr style="background:var(--bg);">
+            <td colspan="4" style="text-align:right;color:var(--ink3);font-size:.82rem">Subtotal s/ IVA</td>
+            <td colspan="2"><strong>&#8364;{{ "%.2f"|format(invoice.total_net) }}</strong></td><td></td>
+          </tr>
+          <tr style="background:var(--bg);">
+            <td colspan="4" style="text-align:right;color:var(--ink3);font-size:.82rem">Total IVA</td>
+            <td colspan="2"><strong>&#8364;{{ "%.2f"|format(invoice.total_vat) }}</strong></td><td></td>
+          </tr>
+          <tr style="background:var(--bg);">
+            <td colspan="4" style="text-align:right;font-weight:600">Total a Pagar</td>
+            <td colspan="2" style="font-size:1rem"><strong>&#8364;{{ "%.2f"|format(invoice.total_amount) }}</strong></td><td></td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="form-card">
+      <h4 style="font-size:.9rem;font-weight:600;margin-bottom:16px">Adicionar Linha</h4>
+      <form method="post" action="{{ url_for('add_item',invoice_id=invoice.id) }}">
+        <div class="form-group"><label>Descrição</label><input type="text" name="description" required placeholder="Ex: Desenvolvimento web — 5 horas"></div>
+        <div class="form-row">
+          <div class="form-group"><label>Quantidade</label><input type="number" name="quantity" min="1" step="1" value="1" required></div>
+          <div class="form-group"><label>Preço Unitário (EUR)</label><input type="number" name="price" min="0" step="0.01" required placeholder="0.00"></div>
+        </div>
+        <div class="form-group">
+          <label>Taxa de IVA (%)</label>
+          <select name="vat_rate">
+            <option value="23">23% — Taxa Normal</option>
+            <option value="13">13% — Taxa Intermédia</option>
+            <option value="6">6% — Taxa Reduzida</option>
+            <option value="0">0% — Isento</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">+ Adicionar</button>
+      </form>
+    </div>
+
+    <div class="email-panel">
+      <h4>Enviar por Email</h4>
+      <p style="font-size:.82rem;color:var(--ink3);margin-bottom:12px">PDF enviado automaticamente como anexo.</p>
+      <form method="post" action="{{ url_for('send_email',invoice_id=invoice.id) }}">
+        <div class="email-row">
+          <input type="email" name="to_email" placeholder="destinatario@exemplo.com" value="{{ invoice.client_email }}" required>
+          <button type="submit" class="btn btn-primary">Enviar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div>
+    <div class="detail-meta">
+      <h4 style="font-size:.88rem;font-weight:600;margin-bottom:14px">Detalhes da Fatura</h4>
+      <div class="meta-row"><span class="meta-key">Número</span><span class="meta-val mono" style="font-size:.82rem">{{ invoice.invoice_num }}</span></div>
+      <div class="meta-row"><span class="meta-key">Série</span><span class="meta-val mono">{{ invoice.series or 'A' }}</span></div>
+      <div class="meta-row"><span class="meta-key">Estado</span><span class="badge badge-{{ invoice.status|lower }}">{{ invoice.status }}</span></div>
+      <div class="meta-row"><span class="meta-key">Data</span><span class="meta-val">{{ invoice.date }}</span></div>
+      <div class="meta-row"><span class="meta-key">Vencimento</span><span class="meta-val">{{ invoice.due_date or '—' }}</span></div>
+      {% if invoice.atcud %}
+      <div class="meta-row"><span class="meta-key">ATCUD</span><span class="meta-val mono" style="font-size:.75rem;color:#2351f5">{{ invoice.atcud }}</span></div>
+      {% else %}
+      <div class="meta-row"><span class="meta-key">ATCUD</span><span style="font-size:.75rem;color:var(--red)">Não definido</span></div>
+      {% endif %}
+      {% if invoice.vat_exemption %}
+      <div class="meta-row"><span class="meta-key">Isenção</span><span class="meta-val" style="font-size:.78rem">{{ invoice.vat_exemption }}</span></div>
+      {% endif %}
+      <div class="meta-row"><span class="meta-key">Subtotal</span><span class="meta-val">&#8364;{{ "%.2f"|format(invoice.total_net) }}</span></div>
+      <div class="meta-row"><span class="meta-key">IVA</span><span class="meta-val">&#8364;{{ "%.2f"|format(invoice.total_vat) }}</span></div>
+      <div class="meta-row"><span class="meta-key" style="font-weight:600">Total</span><span class="meta-val" style="font-size:1.1rem">&#8364;{{ "%.2f"|format(invoice.total_amount) }}</span></div>
+    </div>
+
+    <div class="detail-meta" style="margin-top:16px">
+      <h4 style="font-size:.88rem;font-weight:600;margin-bottom:14px">Faturar A</h4>
+      <div class="meta-row"><span class="meta-key">Nome</span><span class="meta-val">{{ invoice.client_name }}</span></div>
+      {% if invoice.client_nif %}
+      <div class="meta-row"><span class="meta-key">NIF</span><span class="meta-val mono">{{ invoice.client_nif }}</span></div>
+      {% endif %}
+      <div class="meta-row"><span class="meta-key">Email</span><span class="meta-val" style="font-size:.82rem">{{ invoice.client_email }}</span></div>
+      {% if invoice.client_phone %}<div class="meta-row"><span class="meta-key">Tel.</span><span class="meta-val">{{ invoice.client_phone }}</span></div>{% endif %}
+      {% if invoice.client_address %}<div class="meta-row"><span class="meta-key">Morada</span><span class="meta-val" style="font-size:.8rem">{{ invoice.client_address }}</span></div>{% endif %}
+    </div>
+
+    {% if not invoice.atcud %}
+    <div class="detail-meta" style="margin-top:16px;background:#fffbeb;border-color:#fde68a;">
+      <h4 style="font-size:.85rem;font-weight:600;margin-bottom:8px;color:#92400e;">ATCUD em falta</h4>
+      <p style="font-size:.78rem;color:#78350f;line-height:1.5;">O ATCUD é obrigatório desde Jan 2023. Obtém-se registando a série na AT.</p>
+    </div>
+    {% endif %}
+
+    {% if invoice.notes %}
+    <div class="detail-meta" style="margin-top:16px">
+      <h4 style="font-size:.88rem;font-weight:600;margin-bottom:10px">Notas</h4>
+      <p style="font-size:.84rem;color:var(--ink2);line-height:1.6">{{ invoice.notes }}</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

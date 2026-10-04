@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Sign In — Velo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    :root{--blue:#2351f5;--blue-dark:#1a3fd4;--blue-light:rgba(35,81,245,.08);--ink:#0d0d0d;--ink2:#444;--ink3:#888;--ink4:#bbb;--bg:#f4f5f9;--surface:#fff;--border:#e4e6ee;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html,body{height:100%;}
+    body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;display:flex;flex-direction:column;opacity:0;animation:pageIn .5s ease forwards;}
+    @keyframes pageIn{to{opacity:1;}}
+
+    .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 48px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+    .logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+    .logo-text{font-size:1.15rem;font-weight:600;letter-spacing:-.4px;color:var(--ink);}
+    .topbar-right{display:flex;align-items:center;gap:6px;font-size:.84rem;}
+    .topbar-right span{color:var(--ink3);}
+    .topbar-right a{color:var(--blue);text-decoration:none;font-weight:500;padding:6px 12px;border-radius:7px;transition:background .15s;}
+    .topbar-right a:hover{background:var(--blue-light);}
+
+    .main{flex:1;display:grid;grid-template-columns:1fr 460px;gap:0;max-width:1180px;margin:0 auto;padding:64px 48px;width:100%;align-items:center;}
+
+    .hero{padding-right:80px;animation:slideUp .5s .1s ease both;}
+    @keyframes slideUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:2.5px;color:var(--blue);margin-bottom:28px;}
+    .eyebrow::before{content:'';width:20px;height:2px;background:var(--blue);border-radius:2px;}
+
+    .hero h1{font-size:3.6rem;font-weight:600;line-height:1.06;letter-spacing:-2px;color:var(--ink);margin-bottom:20px;}
+    .hero h1 .accent{color:var(--blue);}
+    .hero p{font-size:1rem;color:var(--ink3);line-height:1.75;margin-bottom:44px;max-width:400px;font-weight:300;}
+
+    .features{display:flex;flex-direction:column;gap:16px;margin-bottom:48px;}
+    .feature{display:flex;align-items:center;gap:12px;font-size:.88rem;color:var(--ink2);}
+    .feature-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);flex-shrink:0;}
+
+    .social-proof{display:flex;align-items:center;gap:14px;}
+    .avatars{display:flex;}
+    .avatar{width:30px;height:30px;border-radius:50%;border:2px solid var(--bg);margin-left:-7px;display:flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:700;color:#fff;background:var(--blue);}
+    .avatar:first-child{margin-left:0;background:#1a3fd4;}
+    .avatar:nth-child(2){background:#4267f7;}
+    .proof-text{font-size:.8rem;color:var(--ink3);line-height:1.4;}
+    .proof-text strong{color:var(--ink2);font-weight:500;}
+
+    .card{background:var(--surface);border-radius:20px;padding:42px;box-shadow:0 8px 48px rgba(0,0,0,.09),0 1px 3px rgba(0,0,0,.04);border:1px solid var(--border);animation:slideUp .5s .2s ease both;}
+    .card-header{margin-bottom:30px;}
+    .card-header h2{font-size:1.5rem;font-weight:600;letter-spacing:-.5px;color:var(--ink);margin-bottom:5px;}
+    .card-header p{font-size:.84rem;color:var(--ink3);}
+
+    .flash-list{list-style:none;margin-bottom:20px;}
+    .flash-list li{padding:10px 14px;border-radius:9px;font-size:.83rem;margin-bottom:6px;}
+    .flash-success{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;}
+    .flash-info{background:#f5f7ff;color:#2351f5;border:1px solid #c7d2fe;}
+    .flash-error{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+
+    .field{margin-bottom:16px;}
+    .field label{display:block;font-size:.71rem;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--ink3);margin-bottom:7px;}
+    .field input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:.92rem;color:var(--ink);background:#fafbfc;transition:border .15s,background .15s,box-shadow .15s;}
+    .field input:focus{outline:none;border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(35,81,245,.1);}
+    .field input::placeholder{color:var(--ink4);}
+
+    .btn-submit{width:100%;padding:13px;background:var(--ink);color:#fff;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;transition:all .15s;margin-top:6px;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:-.2px;}
+    .btn-submit:hover{background:#222;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.18);}
+    .btn-submit:active{transform:translateY(0);}
+    .btn-arrow{transition:transform .15s;}
+    .btn-submit:hover .btn-arrow{transform:translateX(3px);}
+
+    .card-footer{text-align:center;margin-top:22px;font-size:.82rem;color:var(--ink3);}
+    .card-footer a{color:var(--blue);text-decoration:none;font-weight:500;}
+    .card-footer a:hover{text-decoration:underline;}
+
+    .bottom{text-align:center;padding:20px;font-size:.75rem;color:var(--ink4);border-top:1px solid var(--border);background:var(--surface);}
+
+    @media(max-width:860px){
+      .main{grid-template-columns:1fr;padding:40px 24px;}
+      .hero{padding-right:0;margin-bottom:40px;}
+      .hero h1{font-size:2.6rem;}
+      .topbar{padding:0 24px;}
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a href="/" class="logo">
+      <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+        <circle cx="8" cy="8" r="5" fill="#2351f5"/>
+        <rect x="11" y="13" width="8" height="22" rx="4" transform="rotate(-28 11 13)" fill="#2351f5"/>
+      </svg>
+      <span class="logo-text">velo</span>
+    </a>
+    <div class="topbar-right">
+      <span>No account?</span>
+      <a href="{{ url_for('register') }}">Create one free &rarr;</a>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="hero">
+      <div class="eyebrow">Invoice Tracker</div>
+      <h1>Invoicing<br>at <span class="accent">full speed.</span></h1>
+      <p>Create professional invoices, track every payment, and get paid faster — all from one clean dashboard.</p>
+      <div class="features">
+        <div class="feature"><div class="feature-dot"></div>Instant PDF invoices, ready to send in seconds</div>
+        <div class="feature"><div class="feature-dot"></div>Real-time revenue and payment dashboard</div>
+        <div class="feature"><div class="feature-dot"></div>Send invoices directly to clients by email</div>
+        <div class="feature"><div class="feature-dot"></div>Multi-user — each account fully isolated</div>
+      </div>
+      <div class="social-proof">
+        <div class="avatars">
+          <div class="avatar">R</div>
+          <div class="avatar">M</div>
+          <div class="avatar">A</div>
+        </div>
+        <div class="proof-text">Built for <strong>freelancers &amp; small businesses</strong><br>who value their time</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <h2>Welcome back</h2>
+        <p>Sign in to your Velo account</p>
+      </div>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <ul class="flash-list">
+            {% for cat,msg in messages %}<li class="flash-{{ cat }}">{{ msg }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+      <form method="post">
+        <div class="field"><label>Email</label><input type="email" name="email" required autofocus placeholder="you@example.com"></div>
+        <div class="field"><label>Password</label><input type="password" name="password" required placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"></div>
+        <button type="submit" class="btn-submit">Sign In <span class="btn-arrow">&rarr;</span></button>
+      </form>
+      <div class="card-footer">Don't have an account? <a href="{{ url_for('register') }}">Create one free</a></div>
+    </div>
+  </div>
+
+  <div class="bottom">&copy; 2026 Velo &middot; Invoice Tracker</div>
+</body>
+</html>

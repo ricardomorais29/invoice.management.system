@@ -1,0 +1,5 @@
+flask
+fpdf2
+psycopg2-binary
+gunicorn
+qrcode[pil]

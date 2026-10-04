@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Velo{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block topbar_actions %}<a href="{{ url_for('create_invoice') }}" class="btn btn-primary">+ New Invoice</a>{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card highlight"><div class="stat-label">Collected</div><div class="stat-value">&#8364;{{ "%.2f"|format(total_revenue) }}</div><div class="stat-sub">Paid invoices</div></div>
+  <div class="stat-card"><div class="stat-label">Outstanding</div><div class="stat-value">&#8364;{{ "%.2f"|format(total_outstanding) }}</div><div class="stat-sub">Awaiting payment</div></div>
+  <div class="stat-card"><div class="stat-label">Collection Rate</div><div class="stat-value">{{ collection_rate }}%</div><div class="stat-sub">Of total billed</div></div>
+  <div class="stat-card"><div class="stat-label">Invoices</div><div class="stat-value">{{ total_invoices }}</div><div class="stat-sub">{{ total_clients }} clients</div></div>
+</div>
+<div class="table-card">
+  <div class="table-header"><h3>Recent Activity</h3><a href="{{ url_for('invoices') }}" class="btn btn-outline btn-sm">View all</a></div>
+  {% if recent_invoices %}
+  <table>
+    <thead><tr><th>Invoice</th><th>Client</th><th>Date</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for inv in recent_invoices %}
+      <tr>
+        <td class="mono" style="font-size:.82rem">{{ inv.invoice_num }}</td>
+        <td>{{ inv.name }}</td>
+        <td style="color:var(--ink3)">{{ inv.date }}</td>
+        <td><strong>&#8364;{{ "%.2f"|format(inv.total_amount) }}</strong></td>
+        <td><span class="badge badge-{{ inv.status|lower }}">{{ inv.status }}</span></td>
+        <td><a href="{{ url_for('invoice_detail', invoice_id=inv.id) }}" class="btn btn-outline btn-sm">Open →</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><strong>No invoices yet</strong><p>Create your first invoice to get started.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

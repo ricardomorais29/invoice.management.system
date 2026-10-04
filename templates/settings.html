@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Definições — Velo{% endblock %}
+{% block page_title %}Definições{% endblock %}
+{% block content %}
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:22px;max-width:860px;">
+
+  <div class="form-card" style="max-width:none;">
+    <h4 style="font-size:.95rem;font-weight:600;margin-bottom:6px">Dados do Emitente</h4>
+    <p style="font-size:.83rem;color:var(--ink3);margin-bottom:22px">Estes dados aparecem em todas as suas faturas. Obrigatórios por lei.</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}<ul class="flash-list">{% for cat,msg in messages %}<li class="flash-{{ cat }}">{{ msg }}</li>{% endfor %}</ul>{% endif %}
+    {% endwith %}
+    <form method="post">
+      <div class="form-group"><label>NIF (Número de Identificação Fiscal)</label><input type="text" name="nif" value="{{ user.nif or '' }}" placeholder="PT000000000"></div>
+      <div class="form-group"><label>Morada Fiscal</label><textarea name="address" placeholder="Rua, Cidade, Código Postal, Portugal">{{ user.address or '' }}</textarea></div>
+      <div class="form-group">
+        <label>Série de Faturação</label>
+        <input type="text" name="invoice_series" value="{{ user.invoice_series or 'A' }}" placeholder="A" maxlength="10">
+        <p style="font-size:.73rem;color:var(--ink3);margin-top:5px">Letra ou nome que identifica a série (ex: A, 2026, VELO). Obrigatório para ATCUD.</p>
+      </div>
+      <div class="form-group"><label>Gmail (para envio de faturas)</label><input type="email" name="gmail_address" value="{{ user.gmail_address or '' }}" placeholder="you@gmail.com"></div>
+      <div class="form-group"><label>Gmail App Password</label><input type="password" name="gmail_app_pass" value="{{ user.gmail_app_pass or '' }}" placeholder="xxxx xxxx xxxx xxxx"></div>
+      <button type="submit" class="btn btn-primary">Guardar Definições</button>
+    </form>
+  </div>
+
+  <div>
+    <div class="detail-meta" style="margin-bottom:16px;">
+      <h4 style="font-size:.88rem;font-weight:600;margin-bottom:14px">Conta</h4>
+      <div class="meta-row"><span class="meta-key">Nome</span><span class="meta-val">{{ user.name }}</span></div>
+      <div class="meta-row"><span class="meta-key">Email</span><span class="meta-val" style="font-size:.82rem">{{ user.email }}</span></div>
+      <div class="meta-row"><span class="meta-key">NIF</span><span class="meta-val">{{ user.nif or '—' }}</span></div>
+      <div class="meta-row"><span class="meta-key">Série</span><span class="meta-val mono">{{ user.invoice_series or 'A' }}</span></div>
+    </div>
+    <div class="detail-meta" style="background:#fffbeb;border-color:#fde68a;">
+      <h4 style="font-size:.88rem;font-weight:600;margin-bottom:10px;color:#92400e;">⚠ Requisitos Legais PT</h4>
+      <p style="font-size:.78rem;color:#78350f;line-height:1.6;">
+        Para faturas legalmente válidas em Portugal, certifique-se que preenche:
+        <br><br>
+        ✓ NIF do emitente<br>
+        ✓ Morada fiscal<br>
+        ✓ NIF do cliente (quando empresa)<br>
+        ✓ Taxa de IVA por linha<br>
+        ✓ ATCUD em cada fatura<br>
+        <br>
+        O ATCUD é gerado pela AT após registo da série de faturação.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

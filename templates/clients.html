@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Clients — Velo{% endblock %}
+{% block page_title %}Clients{% endblock %}
+{% block topbar_actions %}<a href="{{ url_for('add_client') }}" class="btn btn-primary">+ Add Client</a>{% endblock %}
+{% block content %}
+<div class="table-card">
+  <div class="table-header"><h3>All Clients</h3><span style="color:var(--ink3);font-size:.82rem">{{ clients|length }} total</span></div>
+  {% if clients %}
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Invoices</th><th>Billed</th><th></th></tr></thead>
+    <tbody>
+      {% for c in clients %}
+      <tr>
+        <td><strong>{{ c.name }}</strong><br><span style="color:var(--ink3);font-size:.75rem">#{{ c.id }}</span></td>
+        <td>{{ c.email }}</td><td>{{ c.phone or '—' }}</td>
+        <td style="color:var(--ink3)">{{ c.invoice_count }}</td>
+        <td><strong>&#8364;{{ "%.2f"|format(c.total_billed) }}</strong></td>
+        <td style="display:flex;gap:6px;padding:12px 22px">
+          <a href="{{ url_for('edit_client', client_id=c.id) }}" class="btn btn-outline btn-sm">Edit</a>
+          <form action="{{ url_for('delete_client', client_id=c.id) }}" method="post" onsubmit="return confirm('Delete?')">
+            <button class="btn btn-danger btn-sm">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><strong>No clients yet</strong><p>Add your first client to start creating invoices.</p></div>
+  {% endif %}
+</div>
+{% endblock %}
